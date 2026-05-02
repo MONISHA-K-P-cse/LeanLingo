@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">leanlingo</string>
-    <string name="title_activity_main">leanlingo</string>
-    <string name="package_name">com.leanlingo.app</string>
-    <string name="custom_url_scheme">com.leanlingo.app</string>
-</resources>
