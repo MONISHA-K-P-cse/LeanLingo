@@ -23,9 +23,4 @@ jobs:
         run: npm run build
 
       - name: CapGo Deploy
-        uses: Capgo/capacitor-updater-action@main
-        with:
-          api_key: ${{ secrets.CAPGO_TOKEN }}
-          app_id: com.leanlingo.app # This matches your capacitor.config.json
-          channel: production
-          bundle_url: dist
+        run: npx @capgo/cli deploy --token ${{ secrets.CAPGO_TOKEN }} --channel production --bundle dist
