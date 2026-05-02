@@ -1,0 +1,31 @@
+name: Deploy Live Update
+on:
+  push:
+    branches:
+      - main # Change this if your branch name is different (e.g., 'master')
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/checkout@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Web Assets
+        run: npm run build
+
+      - name: CapGo Deploy
+        uses: Capgo/capacitor-updater-action@main
+        with:
+          api_key: ${{ secrets.CAPGO_TOKEN }}
+          app_id: com.leanlingo.app # This matches your capacitor.config.json
+          channel: production
+          bundle_url: dist

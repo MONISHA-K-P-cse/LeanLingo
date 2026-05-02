@@ -1,0 +1,11 @@
+{
+  "appId": "com.leanlingo.app",
+  "appName": "leanlingo",
+  "webDir": "dist",
+  "plugins": {
+    "CapacitorUpdater": {
+      "autoUpdate": true,
+      "stats": true
+    }
+  }
+}

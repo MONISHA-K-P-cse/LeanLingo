@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "807869123123",
+    "project_id": "leanlingo-0629",
+    "storage_bucket": "leanlingo-0629.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:807869123123:android:5f59709a028c170ded3146",
+        "android_client_info": {
+          "package_name": "com.leanlingo.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "807869123123-33me669gp8b5pcdafs4tjnvhdlb0tmcr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBr7rxdjQaOv6-9n-10Rx0YkRXc6_xg-L4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "807869123123-33me669gp8b5pcdafs4tjnvhdlb0tmcr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
