@@ -23,4 +23,4 @@ jobs:
         run: npm run build
 
       - name: CapGo Deploy
-        run: npx @capgo/cli deploy --token ${{ secrets.CAPGO_TOKEN }} --channel production --bundle dist
+        run: npx @capgo/cli@latest bundle upload com.leanlingo.app --apikey ${{ secrets.CAPGO_TOKEN }} --channel production --path dist
