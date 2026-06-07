@@ -3,7 +3,8 @@ import {
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signOut, 
-  onAuthStateChanged 
+  onAuthStateChanged,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
@@ -29,6 +30,7 @@ interface AuthContextType {
   toggleSaveQuestion: (questionId: string) => Promise<boolean | undefined>;
   deleteUserAccount: (userId: string) => Promise<void>;
   deleteQuestion: (questionId: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -137,6 +139,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await signOut(auth);
   };
 
+  const resetPassword = async (email: string) => {
+    await sendPasswordResetEmail(auth, email);
+  };
+
   const updateUser = async (updates: Partial<User>) => {
     if (user) {
       try {
@@ -196,7 +202,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       updateUser, 
       toggleSaveQuestion,
       deleteUserAccount,
-      deleteQuestion
+      deleteQuestion,
+      resetPassword
     }}>
       {/* We don't render children until the initial auth check is done to prevent flickering */}
       {!loading && children}

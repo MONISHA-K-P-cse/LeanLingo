@@ -6,9 +6,11 @@ import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
+  const { resetPassword } = useAuth();
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,12 +25,24 @@ export default function ForgotPassword() {
 
     setIsLoading(true);
 
-    // Simulate sending recovery email
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    setIsSubmitted(true);
-    setIsLoading(false);
-    toast.success('Recovery email sent! Check your inbox.');
+    try {
+      await resetPassword(email);
+      setIsSubmitted(true);
+      toast.success('Recovery email sent! Check your inbox.');
+    } catch (error: any) {
+      console.error('Error resetting password:', error);
+      let message = 'Failed to send recovery email. Please try again.';
+      if (error.code === 'auth/user-not-found') {
+        message = 'No user found with this email address.';
+      } else if (error.code === 'auth/invalid-email') {
+        message = 'Invalid email address format.';
+      } else if (error.code === 'auth/network-request-failed') {
+        message = 'Network error. Please check your connection.';
+      }
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

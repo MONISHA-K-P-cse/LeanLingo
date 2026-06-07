@@ -6,6 +6,7 @@ import { Heart, Bell, MessageSquare, Award, Loader2 } from 'lucide-react';
 import { requestNotificationPermission, db } from '../../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { collection, query, orderBy, limit, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { toast } from 'sonner';
 
 const MATH_CATEGORIES = ['all', 'algebra', 'logic', 'calculus', 'geometry', 'number theory', 'basics'];
 
@@ -37,6 +38,10 @@ export function Feed() {
         });
       });
       setPosts(livePosts);
+      setLoading(false);
+    }, (error: any) => {
+      console.error("Feed error:", error);
+      toast.error(`Failed to load feed: ${error.message || error}`);
       setLoading(false);
     });
 

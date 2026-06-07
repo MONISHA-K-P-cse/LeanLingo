@@ -47,8 +47,9 @@ export default function Questions() {
           fetchedQuestions.push({ id: doc.id, ...doc.data() } as Question);
         });
         setQuestions(fetchedQuestions);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching questions:", error);
+        toast.error(`Failed to load questions: ${error.message || error}`);
       } finally {
         setLoading(false);
       }

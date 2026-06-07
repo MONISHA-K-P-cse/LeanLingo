@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { ArrowLeft, Play, CheckCircle, XCircle, Lightbulb, Users, Upload, BookOpen, Lock, ThumbsUp, Trash2 } from 'lucide-react';
+import { ArrowLeft, Play, CheckCircle, XCircle, Lightbulb, Users, Upload, BookOpen, Lock, ThumbsUp, Trash2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PROGRESS_KEY = 'leanlingo_question_progress';
@@ -49,8 +49,9 @@ export default function Question() {
         } else {
           setQuestion(null);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching question:", error);
+        toast.error(`Failed to load question details: ${error.message || error}`);
       } finally {
         setLoadingQuestion(false);
       }
@@ -170,6 +171,20 @@ export default function Question() {
           questionsCompleted: user.questionsCompleted + 1,
           level: Math.floor((user.questionsCompleted + 1) / 10) + 1,
         });
+
+        // Save solution to Firestore submissions collection
+        try {
+          const { doc, setDoc, serverTimestamp } = await import('firebase/firestore');
+          await setDoc(doc(db, 'submissions', `${user.id}_${id}`), {
+            questionId: id,
+            userId: user.id,
+            username: user.username,
+            code: code,
+            createdAt: serverTimestamp()
+          });
+        } catch (submissionError) {
+          console.error("Error saving submission to Firestore:", submissionError);
+        }
       }
 
       // Clear saved progress for this question
@@ -454,6 +469,7 @@ export default function Question() {
                 <TabsList className="mb-4">
                   <TabsTrigger value="editor">Editor</TabsTrigger>
                   <TabsTrigger value="documentation">Documentation</TabsTrigger>
+                  <TabsTrigger value="solutions">Community Solutions</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="editor" className="space-y-4">
@@ -535,11 +551,96 @@ export default function Question() {
                     </pre>
                   </div>
                 </TabsContent>
+
+                <TabsContent value="solutions" className="space-y-4">
+                  <CommunitySolutions questionId={id || ''} />
+                </TabsContent>
               </Tabs>
             </CardContent>
           </Card>
         </div>
       </div>
+    </div>
+  );
+}
+
+function CommunitySolutions({ questionId }: { questionId: string }) {
+  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!questionId) return;
+    const fetchSubmissions = async () => {
+      try {
+        const { collection, query, where, getDocs } = await import('firebase/firestore');
+        const q = query(
+          collection(db, 'submissions'),
+          where('questionId', '==', questionId)
+        );
+        const querySnapshot = await getDocs(q);
+        const list: any[] = [];
+        querySnapshot.forEach((doc) => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+        
+        // Sort in memory by createdAt descending to avoid composite index requirements
+        list.sort((a, b) => {
+          const timeA = a.createdAt?.seconds || 0;
+          const timeB = b.createdAt?.seconds || 0;
+          return timeB - timeA;
+        });
+        
+        setSubmissions(list);
+      } catch (error) {
+        console.error("Error fetching submissions:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSubmissions();
+  }, [questionId]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 space-y-4">
+        <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+        <p className="text-gray-500 font-medium">Loading community solutions...</p>
+      </div>
+    );
+  }
+
+  if (submissions.length === 0) {
+    return (
+      <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed">
+        <p className="text-gray-500">No solutions submitted by the community yet. Be the first to solve it!</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+      {submissions.map((sub) => (
+        <Card key={sub.id} className="overflow-hidden">
+          <CardHeader className="py-3 px-4 bg-gray-50 border-b">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-[10px] font-bold">
+                  {sub.username?.charAt(0).toUpperCase()}
+                </div>
+                <span className="text-sm font-semibold">{sub.username}</span>
+              </div>
+              <span className="text-xs text-gray-500">
+                {sub.createdAt?.toDate ? new Date(sub.createdAt.toDate()).toLocaleDateString() : 'Recent'}
+              </span>
+            </div>
+          </CardHeader>
+          <CardContent className="p-4">
+            <pre className="p-3 bg-gray-900 text-gray-100 rounded-lg text-xs font-mono overflow-x-auto max-h-[200px]">
+              <code>{sub.code}</code>
+            </pre>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

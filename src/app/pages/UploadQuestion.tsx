@@ -24,6 +24,7 @@ export default function UploadQuestion() {
     points: '',
     code: '',
     solution: '',
+    acceptedSolutions: [] as string[],
     tags: [] as string[],
     hints: [] as { level: number, text: string, unlocked: boolean }[],
     resources: [] as { title: string, url: string, type: string }[],
@@ -31,6 +32,7 @@ export default function UploadQuestion() {
 
   const [tagInput, setTagInput] = useState('');
   const [hintInput, setHintInput] = useState('');
+  const [alternativeSolutionInput, setAlternativeSolutionInput] = useState('');
   const [resourceData, setResourceData] = useState({ title: '', url: '', type: 'documentation' });
 
   const handleAddTag = () => {
@@ -82,6 +84,23 @@ export default function UploadQuestion() {
     });
   };
 
+  const handleAddAlternativeSolution = () => {
+    if (alternativeSolutionInput.trim() && !formData.acceptedSolutions.includes(alternativeSolutionInput.trim())) {
+      setFormData({
+        ...formData,
+        acceptedSolutions: [...formData.acceptedSolutions, alternativeSolutionInput.trim()],
+      });
+      setAlternativeSolutionInput('');
+    }
+  };
+
+  const handleRemoveAlternativeSolution = (index: number) => {
+    setFormData({
+      ...formData,
+      acceptedSolutions: formData.acceptedSolutions.filter((_, i) => i !== index),
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -98,6 +117,7 @@ export default function UploadQuestion() {
         points: parseInt(formData.points) || 50,
         code: formData.code,
         solution: formData.solution,
+        acceptedSolutions: [formData.solution, ...formData.acceptedSolutions].filter(Boolean),
         tags: formData.tags,
         hints: formData.hints,
         resources: formData.resources,
@@ -267,6 +287,32 @@ export default function UploadQuestion() {
                       value={formData.solution}
                       onChange={(e) => setFormData({ ...formData, solution: e.target.value })}
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="alternative-solutions">Alternative Accepted Solutions</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="alternative-solutions"
+                        placeholder="theorem example : ... := by\n  simp"
+                        value={alternativeSolutionInput}
+                        onChange={(e) => setAlternativeSolutionInput(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAlternativeSolution())}
+                      />
+                      <Button type="button" onClick={handleAddAlternativeSolution} variant="outline" size="icon">
+                        <Plus size={18} />
+                      </Button>
+                    </div>
+                    <div className="space-y-2 mt-2">
+                      {formData.acceptedSolutions.map((sol, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-purple-50/50 rounded-lg border border-purple-100 font-mono text-xs">
+                          <span className="truncate">{sol}</span>
+                          <button type="button" onClick={() => handleRemoveAlternativeSolution(index)} className="text-gray-400 hover:text-red-500">
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

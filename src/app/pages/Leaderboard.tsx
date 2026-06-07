@@ -40,8 +40,9 @@ export default function Leaderboard() {
       });
       setLeaderboardData(data);
       setLoading(false);
-    }, (error) => {
+    }, (error: any) => {
       console.error("Leaderboard error:", error);
+      toast.error(`Failed to load leaderboard: ${error.message || error}`);
       setLoading(false);
     });
 
