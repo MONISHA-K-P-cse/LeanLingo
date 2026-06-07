@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { ArrowLeft, Play, CheckCircle, XCircle, Lightbulb, Users, Upload, BookOpen, Lock, ThumbsUp, Trash2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Play, CheckCircle, XCircle, Lightbulb, Users, Upload, BookOpen, Lock, ThumbsUp, Trash2, Loader2, Bookmark, BookmarkCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PROGRESS_KEY = 'leanlingo_question_progress';
